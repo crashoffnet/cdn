@@ -84,6 +84,65 @@
         return encodeURIComponent(location.href.rtrim('/').replace('https://', ''))
     }
 
+    const getService = async () => {
+        let serviceUrl = getServiceUrl()
+
+        if (leoServices && serviceUrl) {
+            let url = serviceUrl.split('.')
+
+            if (url[0] == 'www') {
+                url = url[1]
+            } else {
+                url = url[0]
+            }
+
+            if (url == 'crashoff' && serviceUrl.indexOf('app-frame') === -1) {
+                return {
+                    error: false,
+                    name: 'master'
+                }
+            }
+
+            let service = null
+
+            for (const s of leoServices) {
+                let stop = false
+
+                for (const pattern of s.pattern.split(',')) {
+                    if (url.indexOf(pattern.replace('!', '')) !== -1) {
+                        if (pattern.includes('!')) {
+                            stop = true
+                        } else {
+                            service = s.slug
+                        }
+                    }
+                }
+
+                if (stop) {
+                    service = null
+                }
+
+                if (service) {
+                    break
+                }
+            }
+
+            if (service) {
+                return {
+                    error: false,
+                    name: service
+                }
+            }
+        } else if (serviceUrl) {
+            const serviceResponse = await fetch(`${APP_URL}/api/service?url=${serviceUrl}`)
+            return await serviceResponse.json()
+        }
+
+        return {
+            error: true
+        }
+    }
+
     const getDynamicData = (serviceName) => {
         let returnData = null
 
@@ -461,8 +520,7 @@
     }
 
     const startApp = async () => {
-        const serviceResponse = await fetch(`${APP_URL}/api/service?url=${getServiceUrl()}`)
-        globalService = await serviceResponse.json()
+        globalService = await getService()
 
         if (globalService && !globalService.error) {
             if (!document.getElementById('leo-inline-styles')) {
@@ -475,7 +533,7 @@
                 return
             }
 
-            logInfo()
+            // logInfo()
 
             setTimeout (() => {
                 app.classList.add('is-show')
