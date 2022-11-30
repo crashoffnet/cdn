@@ -1,6 +1,7 @@
 (function () {
     const APP_URL = 'https://crashoff.net'
     const APP_KEY = 'bzOM1HXTojkijkqJ'
+    const APP_VERSION = '1.2.11'
 
     String.prototype.rtrim = function(s) { 
         return this.replace(new RegExp(s + "*$"), '');
@@ -24,7 +25,7 @@
             console.clear()
         }
 
-        console.group('%cLeonardo запущен', 'font-size: large; color: orange')
+        console.group(`%cLeonardo (v${APP_VERSION}) запущен`, 'font-size: large; color: orange')
         console.log('%cК сожалению, все вычисления происходят на стороне нашего сервера. Поэтому здесь не будет ничего интересного.', 'color: lightblue')
         console.log('%cМы никак не собираем ваши данные. Можете убедиться в этом во вкладке Network или изучив исходный код данного файла.', 'color: lightblue')
     }
@@ -199,8 +200,6 @@
             const counterText = document.querySelector('.info-text').innerHTML.trim()
 
             let status = null, counter = ''
-
-            // test okda
 
             if (counterText.startsWith('Starting in')) {
                 status = 'timer'
