@@ -534,7 +534,7 @@
                 return
             }
 
-            // logInfo()
+            logInfo()
 
             setTimeout (() => {
                 app.classList.add('is-show')
@@ -558,46 +558,6 @@
             }, 100)
         }
     }
-
-    const WebSocketProxy = new Proxy(window.WebSocket, {
-        construct(target, args) {
-            console.log(args);
-        
-            const instance = new target(...args);
-        
-            const openHandler = (event) => {
-                console.log('Open', event);
-            };
-        
-            const messageHandler = (event) => {
-                console.log('Message', event);
-            };
-        
-            const closeHandler = (event) => {
-                console.log('Close', event);
-                instance.removeEventListener('open', openHandler);
-                instance.removeEventListener('message', messageHandler);
-                instance.removeEventListener('close', closeHandler);
-            };
-        
-            instance.addEventListener('open', openHandler);
-            instance.addEventListener('message', messageHandler);
-            instance.addEventListener('close', closeHandler);
-        
-            const sendProxy = new Proxy(instance.send, {
-                apply: function(target, thisArg, _args) {
-                    console.log('Send', _args);
-                    target.apply(thisArg, _args);
-                }
-            });
-        
-            instance.send = sendProxy;
-        
-            return instance;
-        },
-        });
-        
-        window.WebSocket = WebSocketProxy;
 
     setTimeout(startApp, 500)
 })()
