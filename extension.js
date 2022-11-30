@@ -202,7 +202,7 @@
 
             if (counterText.startsWith('Starting in')) {
                 status = 'timer'
-                counter = (Math.floor(parseFloat(counterText.replace('Starting in 0', '')) * 10) / 10).toFixed(1) + 's'
+                counter = (Math.floor(parseFloat(counterText.replace('Starting in 0', '').replace('s', '')) * 10) / 10).toFixed(1) + 's'
             } else if (counterText.startsWith('Crashed at')) {
                 status = 'crash'
                 counter = counterText.replace('Crashed at x', '') + 'x'
