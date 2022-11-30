@@ -200,6 +200,8 @@
 
             let status = null, counter = ''
 
+            // test okda
+
             if (counterText.startsWith('Starting in')) {
                 status = 'timer'
                 counter = (Math.floor(parseFloat(counterText.replace('Starting in 0', '').replace('s', '')) * 10) / 10).toFixed(1) + 's'
