@@ -226,7 +226,7 @@
                 counter = crashCounter.innerText.replace('x', '') + 'x'
             } else {
                 status = 'timer'
-                counter = document.querySelector('.countdown').innerText + 's'
+                counter = Math.floor(parseFloat(document.querySelector('.countdown').innerText) * 10) / 10 + 's'
             }
 
             returnData = {
