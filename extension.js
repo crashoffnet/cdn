@@ -88,7 +88,7 @@
     const getService = async () => {
         let serviceUrl = getServiceUrl()
 
-        if (leoServices && serviceUrl) {
+        if (typeof leoServices !== 'undefined' && leoServices && serviceUrl) {
             let url = serviceUrl.split('.')
 
             if (url[0] == 'www') {
