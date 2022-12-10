@@ -80,6 +80,8 @@
             return 'up-x.com'
         } else if (document.title.trim() == 'Aviator') {
             return 'lucky-jet.com'
+        } else if (document.title.includes('Dragon Money')) {
+            return 'drgn.com'
         }
         
         return encodeURIComponent(location.href.rtrim('/').replace('https://', ''))
@@ -143,6 +145,8 @@
             error: true
         }
     }
+    
+    let lastStatus = null
 
     const getDynamicData = (serviceName) => {
         let returnData = null
@@ -252,7 +256,7 @@
                 counter = originElement.parentNode.firstChild.innerHTML + 'x'
             } else {
                 status = 'timer'
-                counter = (Math.floor(parseFloat(originElement.parentNode.parentNode.parentNode.lastChild.lastChild.childNodes[0].style.width.replace('%')) / 100 * 5 * 10) / 10).toFixed(1) + 's'
+                counter = (Math.floor(parseFloat(originElement.parentNode.parentNode.parentNode.lastChild.lastChild.childNodes[0].style.width.replace('%', '')) / 100 * 5 * 10) / 10).toFixed(1) + 's'
             }
 
             returnData = {
@@ -296,6 +300,94 @@
             returnData = {
                 counter, 
                 ratios: Array.from(document.querySelectorAll('.crash-chart-history-multipliers__item .multiplier')).map((el) => parseFloat(el.innerText.replace('x', ''))),
+                status
+            }
+        } else if (serviceName == 'stake') {
+            let status = null, counter = ''
+
+            const checkText = document.querySelector('.crash-game .wrap').innerText
+
+            if (checkText.endsWith('с') || checkText.endsWith('s')) {
+                if (lastStatus != 'crash') {
+                    status = lastStatus = 'crash'
+                } else {
+                    status = 'timer'
+                }
+
+                const width = document.querySelector('.crash-game .wrap .progress-bar').style.width
+
+                if (width) {
+                    counter = (Math.floor(parseFloat(width.replace('%', '')) / 100 * 6 * 10) / 10).toFixed(1) + 's'
+                }
+            } else {
+                status = lastStatus = 'progress'
+
+                const maxRatio = Array.from(document.querySelectorAll('.game-sidebar .wrap table tr td:nth-child(2)')).map((el) => el.innerText.replace('×', '').replace(',', '.')).filter((ratio) => ratio != '-').map((ratio) => parseFloat(ratio)).reduce((a, b) => Math.max(a, b), 0)
+
+                if (!maxRatio) {
+                    counter = '1.00x'
+                } else {
+                    counter = maxRatio.toFixed(2) + 'x'
+                }
+            }
+
+            returnData = {
+                counter,
+                ratios: Array.from(document.querySelectorAll('.past-bets button')).map((el) => parseFloat(el.innerText.replace('×', '').replace(',', '.'))),
+                status
+            }
+        } else if (serviceName == 'dragon-money') {
+            const ratioElement = document.querySelector('.multiplier-view'), graphicElement = document.querySelector('.disable-graphic')
+
+            if (!ratioElement) {
+                graphicElement.click()
+            }
+
+            if (graphicElement) {
+                graphicElement.remove()
+            }
+
+            let status = null, counter = ''
+
+            if (document.querySelector('.time-till-start').style.display == 'none') {
+                if (document.querySelector('.multiplier-view.no-schedule-end')) {
+                    status = 'crash'
+                } else {
+                    status = 'progress'
+                }
+
+                counter = ratioElement.innerText
+            } else {
+                status = 'timer'
+                counter = parseFloat(document.querySelector('.text-time-start').innerText.replace('Начало игры через ', '').trim()).toFixed(1) + 's'
+            }
+
+            returnData = {
+                counter,
+                ratios: Array.from(document.querySelectorAll('.history-buttons-cont .item')).map((el) => parseFloat(el.innerText.replace('x', ''))),
+                status
+            }
+        } else if (serviceName == 'get-x') {
+            const ratioElement = document.querySelector('.ratio-timer')
+
+            let status = null, counter = ''
+
+            if (ratioElement.style.display != 'none') {
+                if (document.querySelector('.ratio-timer.ratio-timer__red')) {
+                    status = 'crash'
+                } else {
+                    status = 'progress'
+                }
+
+                counter = ratioElement.querySelector('span:first-child').innerText + 'x'
+            } else {
+                status = 'timer' 
+                counter = (Math.floor((1 - parseFloat(getComputedStyle(document.querySelector('.loader__line')).width.replace('px', '')) / 192) * 6 * 10) / 10).toFixed(1) + 's'
+            }
+
+            returnData = {
+                counter,
+                ratios: Array.from(document.querySelectorAll('.line-tags__tag')).map((el) => parseFloat(el.innerText.split(' ')[0])),
                 status
             }
         }
