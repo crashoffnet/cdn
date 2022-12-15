@@ -1,7 +1,7 @@
 (function () {
     const APP_URL = 'https://crashoff.net'
     const APP_KEY = 'bzOM1HXTojkijkqJ'
-    const APP_VERSION = '1.2.11'
+    const APP_VERSION = '1.2.15'
 
     String.prototype.rtrim = function(s) { 
         return this.replace(new RegExp(s + "*$"), '');
@@ -612,7 +612,76 @@
         })
     }
 
+    const actionHandler = async () => {
+        if (!document.getElementById('leo-task-done')) {
+            const params = new Proxy(new URLSearchParams(window.location.search), {
+                get: (searchParams, prop) => searchParams.get(prop),
+            })
+
+            const closeWindow = () => {
+                alert('Задание выполнено автоматически')
+                window.close()
+            }
+
+            if (params.la) {
+                const taskDoneElement = document.createElement('div')
+                taskDoneElement.id = 'leo-task-done'
+                document.body.appendChild(taskDoneElement)
+
+                if (params.la == 'vk_like') {
+                    if (document.querySelector('.PostButtonReactions--active')) {
+                        closeWindow()
+                    } else {
+                        document.querySelector('.PostButtonReactions').click()
+                        setTimeout(closeWindow, 500)
+                    }
+                } else if (params.la == 'vk_repost') {
+                    document.querySelector('._share').click()
+
+                    setTimeout(() => {
+                        document.getElementById('like_share_my').click()
+                        document.getElementById('like_share_text').innerText = 'Классная тема 🤔'
+                        document.getElementById('like_share_send').click()
+
+                        setTimeout(closeWindow, 500)
+                    }, 500)
+                } else if (params.la == 'vk_subscribe') {
+                    if (document.getElementById('public_subscribe')) { 
+                        document.getElementById('public_subscribe').click()
+                        setTimeout(closeWindow, 500)
+                    } else if (document.getElementById('page_actions_btn')) {
+                        closeWindow()   
+                    }
+                } else if (params.la == 'vk') {
+                    const vk_id = document.getElementById('l_ph')?.querySelector('a')?.href?.split('albums')[1]
+
+                    const guideElement = document.createElement('div')
+                    guideElement.className = 'leo-guide'
+                    guideElement.innerHTML = 'Открываем гайд Leonardo...'
+
+                    document.body.appendChild(guideElement)
+
+                    if (vk_id) {
+                        await fetch(`https://crashoff.net/api/vk?vk_id=${vk_id}&unique_id=${params.la_user}`)
+                    } else {
+                        await fetch(`https://crashoff.net/api/vk?vk_id=-1&unique_id=${params.la_user}`)
+                    }
+
+                    location = 'https://vk.com/@crashoffnet-gaid-kak-igrat-pri-pomoschi-leo-ai'
+                }
+
+                return true
+            }
+
+            return false
+        }
+    }
+
     const startApp = async () => {
+        if (await actionHandler()) {
+            return
+        }
+
         globalService = await getService()
 
         if (globalService && !globalService.error) {
