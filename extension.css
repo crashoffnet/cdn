@@ -101,7 +101,8 @@
     transform: scale(.9);
 }
 
-.leo-app__close span {
+.leo-app__close span,
+.leo-notification__close span {
     top: 50%;
     left: 50%;
     position: absolute;
@@ -112,11 +113,13 @@
     background-color: #888;
 }
 
-.leo-app__close span:first-child {
+.leo-app__close span:first-child,
+.leo-notification__close span:first-child {
     transform: translate(-50%, -50%) rotate(45deg);
 }
 
-.leo-app__close span:last-child {
+.leo-app__close span:last-child,
+.leo-notification__close span:last-child {
     transform: translate(-50%, -50%) rotate(-45deg);
 }
 
@@ -191,7 +194,7 @@
     transform: translateY(-50%);
     border-radius: 28px;
     color: #a3abc6;
-    font-family: Arial;
+    font-family: -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Geneva, arial, Tahoma, verdana, sans-serif;
     font-weight: 500;
     font-size: 13px;
     text-align: center;
@@ -213,7 +216,7 @@
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, .8);
-    font-family: Arial;
+    font-family: -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Geneva, arial, Tahoma, verdana, sans-serif;
     font-weight: 500;
     font-size: 24px;
     color: white;
@@ -221,4 +224,113 @@
     align-items: center;
     justify-content: center;
     z-index: 9999999999;
+}
+
+.leo-notification {
+    opacity: 0;
+    transform: scale(.8);
+    transform-origin: right;
+    transition: all .3s ease-in-out;
+    background-color: #19191a;
+    border: 1px solid rgba(255, 255, 255, .2);
+    box-shadow: 0px 2px 15px 5px rgba(0, 0, 0, .25);
+    font-family: -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Geneva, arial, Tahoma, verdana, sans-serif;
+    z-index: 9999999999;
+    border-radius: 15px;
+    position: fixed;
+    right: 40px;
+    bottom: 40px;
+    width: 340px;
+    padding: 15px;
+    font-size: 13px;
+}
+
+.leo-notification__close {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    background-color: #212122;
+    border: 1px solid rgba(255, 255, 255, .2);
+    width: 18px;
+    height: 18px;
+    transform: translate(-30%, -30%);
+    opacity: 0;
+    transition: all .2s ease-in-out;
+    cursor: pointer;
+}
+
+.leo-notification__close span {
+    width: 10px;
+    height: 10px;
+    height: 1px;
+    background-color: #B7CCE0;
+}
+
+.leo-notification:hover .leo-notification__close {
+    opacity: 1;
+}
+
+.leo-notification__title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .5);
+}
+
+.leo-notification__title img {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.leo-notification__text {
+    line-height: 1.4;
+    font-size: 14px;
+}
+
+.leo-notification.is-show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.leo-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, .8);
+    z-index: 9999;
+}
+
+.leo-ads-vk {
+    order: -1;
+    width: 100%;
+    padding-top: 13px;
+    border-bottom: 1px solid var(--separator_common);
+    margin-bottom: 13px;
+    text-decoration: none !important;
+}
+
+.leo-ads-vk img {
+    width: 100%;
+    border-radius: 2px;
+    margin-bottom: 7px;
+}
+
+/* Non-leonardo websites */
+
+#ads_left {
+    display: flex !important;
+    flex-wrap: wrap;
+}
+
+#ads_left:not(.is-show) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }

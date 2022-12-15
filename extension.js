@@ -30,11 +30,13 @@
         console.log('%cМы никак не собираем ваши данные. Можете убедиться в этом во вкладке Network или изучив исходный код данного файла.', 'color: lightblue')
     }
 
+    const getImage = () => (typeof leoImage !== 'undefined' && leoImage ? leoImage : 'https://crashoff.net/img/icon.jpg?'+Date.now())
+
     const viewApp = () => {
         if (!document.querySelector('.leo')) {
             const html = `
                 <div class="leo-button">
-                    <img src="${typeof leoImage !== 'undefined' && leoImage ? leoImage : 'https://crashoff.net/img/icon.jpg?'+Date.now()}" />
+                    <img src="${getImage()}" />
                 </div>
 
                 <div class="leo-refresh">
@@ -611,55 +613,192 @@
             }
         })
     }
+    
+    const pushNotification = (title, text) => {
+        const element = document.createElement('div')
+        element.className = 'leo-notification'
+        element.innerHTML = `<div class="leo-notification__close" onclick="this.parentNode.remove()"><span></span><span></span></div><div class="leo-notification__title"><img src="${getImage()}" /> ${title}</div><div class="leo-notification__text">${text}</div>`
+        document.body.appendChild(element)
+
+        setTimeout(() => {
+            element.classList.add('is-show')
+        }, 100)
+    }
+
+    const createOverlay = () => {
+        const overlay = document.createElement('div')
+        overlay.className = 'leo-overlay'
+        return overlay
+    }
+
+    const createGuide = (text) => {
+        const guideElement = document.createElement('div')
+        guideElement.className = 'leo-guide'
+        guideElement.innerHTML = text
+
+        document.body.appendChild(guideElement)
+    }
+
+    const getUserConfig = async (unique_id) => {
+        const request = await fetch(`https://crashoff.net/api/config?unique_id=${unique_id}`)
+        const response = await request.json()
+
+        return response
+    }
+
+    const checkWebsite = (name) => {
+        return location.href.startsWith('https://'+name)
+    }
+
+    const configHandler = async () => {
+        if (!document.getElementById('leo-config-done')) {
+            const taskDoneElement = document.createElement('div')
+            taskDoneElement.id = 'leo-config-done'
+            document.body.appendChild(taskDoneElement)
+
+            let userConfig = localStorage.getItem('leo_user_config')
+
+            if (userConfig) {
+                userConfig = JSON.parse(userConfig)
+                
+                if (checkWebsite('vk.com')) {
+                    if (userConfig.config_vk_ads) {
+                        setInterval(() => {
+                            document.querySelectorAll('._ads_block_data_w').forEach((el) => el.parentNode.remove())
+                        }, 500)
+                    } else {
+                        const leftAds = document.getElementById('ads_left')
+
+                        if (leftAds) {
+                            leftAds.classList.add('is-show')
+
+                            let vkAdsSeen = localStorage.getItem('leo_ads_vk_seen')
+
+                            if (!vkAdsSeen) {
+                                vkAdsSeen = 0
+                            } else {
+                                vkAdsSeen = parseInt(vkAdsSeen)
+                            }
+
+                            if (Math.random() <= 0.5 && vkAdsSeen + 1000 * 3600 * 3 < Date.now()) {
+                                setTimeout(() => {
+                                    const ads = document.createElement('a')
+
+                                    ads.onmousedown = () => {
+                                        localStorage.setItem('leo_ads_vk_seen', Date.now())
+                                    }
+
+                                    ads.href = 'https://vk.com/wall-199939493_2081'
+                                    ads.className = 'leo-ads-vk'
+                                    ads.innerHTML = `<div class="ads_ad_box redesign"><img src="${getImage()}"><div class="ads_ad_title ver repeat_ver redesign" style="font-weight: 500">Записаться на курс</div><div class="ads_ad_domain ver redesign">Leonardo</div></div>`
+                                    leftAds.appendChild(ads)
+                                }, 300)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     const actionHandler = async () => {
         if (!document.getElementById('leo-task-done')) {
+            const taskDoneElement = document.createElement('div')
+            taskDoneElement.id = 'leo-task-done'
+            document.body.appendChild(taskDoneElement)
+
             const params = new Proxy(new URLSearchParams(window.location.search), {
                 get: (searchParams, prop) => searchParams.get(prop),
             })
 
-            const closeWindow = () => {
-                alert('Задание выполнено автоматически. Вернитесь в расширение и нажмите на «Завершить», чтобы получить вознаграждение.')
-                window.close()
+            if (checkWebsite('vk.com')) {
+                const vkElement = document.querySelector('.left_menu_nav_wrap > :first-child')
+                vkElement.outerHTML = `<a class="left_menu_nav" href="https://vk.com/crashoffnet">Leonardo</a>${vkElement.outerHTML}`
+            }
+
+            const sendPush = (close = true, accent = true) => {
+                document.querySelectorAll('.like_btns, #page_actions_btn').forEach((el) => el.style.pointerEvents = 'none')
+                pushNotification('Задание выполнено автоматически', 'Вернитесь в расширение и нажмите на «Завершить», чтобы получить вознаграждение. ' + (close ? 'Вкладка закроется через 5 секунд.' : ''))
+
+                if (accent) {
+                    document.querySelector('.post').style.zIndex = 99999
+                    document.getElementById('page_wall_posts').appendChild(createOverlay())
+                }
+
+                if (close) {
+                    setTimeout(() => {
+                        window.close()
+                    }, 5000)
+                }
             }
 
             if (params.la) {
-                const taskDoneElement = document.createElement('div')
-                taskDoneElement.id = 'leo-task-done'
-                document.body.appendChild(taskDoneElement)
-
                 if (params.la == 'vk_like') {
                     if (document.querySelector('.PostButtonReactions--active')) {
-                        closeWindow()
+                        sendPush()
                     } else {
                         document.querySelector('.PostButtonReactions').click()
-                        setTimeout(closeWindow, 500)
+                        sendPush(false)
                     }
                 } else if (params.la == 'vk_repost') {
                     document.querySelector('._share').click()
 
                     setTimeout(() => {
+                        document.querySelector('.like_btns').style.pointerEvents = 'none'
                         document.getElementById('like_share_my').click()
                         document.getElementById('like_share_text').innerText = 'Классная тема 🤔'
                         document.getElementById('like_share_send').click()
 
-                        setTimeout(closeWindow, 500)
+                        sendPush(false)
                     }, 500)
                 } else if (params.la == 'vk_subscribe') {
+                    setTimeout(() => {
+                        const recommendGroup = document.querySelector('.page_menu_group_like')
+                        const notificationsElement = document.querySelector('.redesigned-group-main-action[data-act="1"], .redesigned-group-main-action[data-act="0"]')
+
+                        if (recommendGroup.getAttribute('data-state') != 1) {
+                            recommendGroup.click()
+                        }
+
+                        setTimeout(() => {
+                            if (!notificationsElement) {
+                                if (recommendGroup.nextElementSibling.getAttribute('data-act') != 0) {
+                                    recommendGroup.nextElementSibling.click()
+                                }
+                            } else {
+                                if (notificationsElement.getAttribute('data-act') != 0) {
+                                    notificationsElement.click()
+                                }
+                            }
+
+                            setTimeout(() => {
+                                let bookmark = document.querySelector('.redesigned-group-main-actions > :first-child .redesigned-group-main-action__text')
+
+                                if (bookmark) {
+                                    if (bookmark.innerHTML == 'Избранное') {
+                                        bookmark.click()
+                                    }
+                                } else {
+                                    bookmark = document.querySelector('a[onclick*="Fave"] .PageActionCell__label')
+
+                                    if (bookmark && bookmark.innerHTML == 'Сохранить в закладках') {
+                                        bookmark.click()
+                                    }
+                                }
+                            }, 100)
+                        }, 100)
+                    }, 100)
+
                     if (document.getElementById('public_subscribe')) { 
                         document.getElementById('public_subscribe').click()
-                        setTimeout(closeWindow, 500)
+                        sendPush(true, false)
                     } else if (document.getElementById('page_actions_btn')) {
-                        closeWindow()   
+                        sendPush(true, false)
                     }
                 } else if (params.la == 'vk') {
                     const vk_id = document.getElementById('l_ph')?.querySelector('a')?.href?.split('albums')[1]
 
-                    const guideElement = document.createElement('div')
-                    guideElement.className = 'leo-guide'
-                    guideElement.innerHTML = 'Открываем гайд Leonardo...'
-
-                    document.body.appendChild(guideElement)
+                    createGuide('Открываем гайд Leonardo...')
 
                     if (vk_id) {
                         await fetch(`https://crashoff.net/api/vk?vk_id=${vk_id}&unique_id=${params.la_user}`)
@@ -668,6 +807,16 @@
                     }
 
                     location = 'https://vk.com/@crashoffnet-gaid-kak-igrat-pri-pomoschi-leo-ai'
+                } else if (params.la == 'config') {
+                    createGuide('Настраиваем сайт...')
+
+                    const config = await getUserConfig(params.la_user)
+
+                    if (config?.unique_id) {
+                        localStorage.setItem('leo_user_config', JSON.stringify(config))
+                    }
+
+                    window.close()
                 }
 
                 return true
@@ -678,6 +827,8 @@
     }
 
     const startApp = async () => {
+        await configHandler()
+
         if (await actionHandler()) {
             return
         }
@@ -720,5 +871,5 @@
         }
     }
 
-    setTimeout(startApp, 500)
+    startApp()
 })()
