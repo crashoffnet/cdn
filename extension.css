@@ -311,13 +311,12 @@
     width: 100%;
     padding-top: 13px;
     border-bottom: 1px solid var(--separator_common);
-    margin-bottom: 13px;
     text-decoration: none !important;
 }
 
 .leo-ads-vk img {
     width: 100%;
-    border-radius: 2px;
+    border-radius: 8px;
     margin-bottom: 7px;
 }
 
