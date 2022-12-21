@@ -688,9 +688,9 @@
                                         localStorage.setItem('leo_ads_vk_seen', Date.now())
                                     }
 
-                                    ads.href = 'https://vk.com/wall-199939493_2081'
+                                    ads.href = 'https://vk.com/@crashoffnet-gaid-kak-igrat-pri-pomoschi-leo-ai'
                                     ads.className = 'leo-ads-vk'
-                                    ads.innerHTML = `<div class="ads_ad_box redesign"><img src="${getImage()}"><div class="ads_ad_title ver repeat_ver redesign" style="font-weight: 700">Записаться на курс!</div><div class="ads_ad_domain ver redesign">LEONARDO</div><div style="color: white;margin-top: 3px;line-height: 15px;">Узнайте как правильно играть с Leonardo и какие существуют тактики</div></div>`
+                                    ads.innerHTML = `<div class="ads_ad_box redesign"><img src="${getImage()}"><div class="ads_ad_title ver repeat_ver redesign" style="font-weight: 700">Гайд по игре</div><div class="ads_ad_domain ver redesign">LEONARDO</div><div style="color: white;margin-top: 3px;line-height: 15px;">Узнайте как правильно играть с Leonardo и какие существуют тактики</div></div>`
                                     leftAds.appendChild(ads)
                                 }, 300)
                             }
