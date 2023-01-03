@@ -92,55 +92,62 @@
     const getService = async () => {
         let serviceUrl = getServiceUrl()
 
-        if (typeof leoServices !== 'undefined' && leoServices && serviceUrl) {
-            let url = serviceUrl.split('.')
+        if (serviceUrl) {
+            if (typeof leoServices !== 'undefined' && leoServices) {
+                let url = serviceUrl.split('.')
 
-            if (url[0] == 'www') {
-                url = url[1]
-            } else {
-                url = url[0]
-            }
-
-            if (url == 'crashoff' && serviceUrl.indexOf('app-frame') === -1) {
-                return {
-                    error: false,
-                    name: 'master'
+                if (url[0] == 'www') {
+                    url = url[1]
+                } else {
+                    url = url[0]
                 }
-            }
 
-            let service = null
-
-            for (const s of leoServices) {
-                let stop = false
-
-                for (const pattern of s.pattern.split(',')) {
-                    if (url.indexOf(pattern.replace('!', '')) !== -1) {
-                        if (pattern.includes('!')) {
-                            stop = true
-                        } else {
-                            service = s.slug
-                        }
+                if (url == 'crashoff' && serviceUrl.indexOf('app-frame') === -1) {
+                    return {
+                        error: false,
+                        name: 'master'
                     }
                 }
 
-                if (stop) {
-                    service = null
+                let service = null
+
+                for (const s of leoServices) {
+                    let stop = false
+
+                    for (const pattern of s.pattern.split(',')) {
+                        if (pattern.includes('!')) {
+                            const newUrl = serviceUrl.split('.')
+
+                            for (let i = 0; i < newUrl.length - 1; i++) {
+                                if (newUrl[i].indexOf(pattern.replace('!', '')) !== -1) {
+                                    stop = true
+                                    break
+                                }
+                            }
+                        } else if (url.indexOf(pattern) !== -1) {
+                            service = s.slug
+                        }
+                    }
+
+                    if (stop) {
+                        service = null
+                    }
+
+                    if (service) {
+                        break
+                    }
                 }
 
                 if (service) {
-                    break
+                    return {
+                        error: false,
+                        name: service
+                    }
                 }
+            } else {
+                const serviceResponse = await fetch(`${APP_URL}/api/service?url=${serviceUrl}`)
+                return await serviceResponse.json()
             }
-
-            if (service) {
-                return {
-                    error: false,
-                    name: service
-                }
-            }
-        } else if (serviceUrl) {
-            const serviceResponse = await fetch(`${APP_URL}/api/service?url=${serviceUrl}`)
-            return await serviceResponse.json()
         }
 
         return {
