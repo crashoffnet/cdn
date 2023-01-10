@@ -739,6 +739,21 @@
                 }
             }
 
+            const isYouTubeTask = () => {
+                if (params.ab_channel && ['ЛудоманчикЛео'].includes(params.ab_channel)) {
+                    return true
+                } else {
+                    const titleElement = document.querySelector('h1.ytd-watch-metadata')
+
+                    if (titleElement) {
+                        const title = titleElement.innerHTML.toLowerCase()
+                        return title.includes('leonardo') || title.includes('леонардо') || title.includes('нейросеть')
+                    }
+                }
+
+                return false
+            }
+
             if (params.la) {
                 if (params.la == 'vk_like') {
                     if (document.querySelector('.PostButtonReactions--active')) {
@@ -824,7 +839,37 @@
                     }
 
                     window.close()
-                }
+                } 
+
+                return true
+            } else if (isYouTubeTask()) {
+                setTimeout(() => {
+                    const likeButton = document.querySelector('#segmented-like-button > * > * > *'), likeWrapper = document.querySelector('ytd-segmented-like-dislike-button-renderer')
+
+                    if (likeButton.getAttribute('aria-pressed') != 'true') {
+                        likeButton.click()
+                        sendPush(false, false)
+                    }
+
+                    likeWrapper.style.pointerEvents = 'none'
+
+                    const subscribeButton = document.querySelector('#subscribe-button > * > * > *')
+                    const notificationButton = document.getElementById('notification-preference-button')
+
+                    if (document.querySelector('#notification-preference-button[hidden]')) {
+                        subscribeButton.click()
+
+                        document.querySelector('#notification-preference-button > * > * > *').click()
+
+                        setTimeout(() => {
+                            document.querySelector('ytd-menu-service-item-renderer:first-child').click()
+                            notificationButton.style.pointerEvents = 'none'
+                            sendPush(false, false)
+                        }, 300)
+                    } else {
+                        notificationButton.style.pointerEvents = 'none'
+                    }
+                }, 500)
 
                 return true
             }
