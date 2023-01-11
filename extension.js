@@ -843,33 +843,37 @@
 
                 return true
             } else if (isYouTubeTask()) {
-                setTimeout(() => {
-                    const likeButton = document.querySelector('#segmented-like-button > * > * > *'), likeWrapper = document.querySelector('ytd-segmented-like-dislike-button-renderer')
+                let likeButton = null
 
-                    if (likeButton.getAttribute('aria-pressed') != 'true') {
-                        likeButton.click()
-                        sendPush(false, false)
-                    }
+                while (!likeButton) {
+                    likeButton = document.querySelector('#segmented-like-button > * > * > *')
+                }
 
-                    likeWrapper.style.pointerEvents = 'none'
+                const likeWrapper = document.querySelector('ytd-segmented-like-dislike-button-renderer')
 
-                    const subscribeButton = document.querySelector('#subscribe-button > * > * > *')
-                    const notificationButton = document.getElementById('notification-preference-button')
+                if (likeButton.getAttribute('aria-pressed') != 'true') {
+                    likeButton.click()
+                    sendPush(false, false)
+                }
 
-                    if (document.querySelector('#notification-preference-button[hidden]')) {
-                        subscribeButton.click()
+                likeWrapper.style.pointerEvents = 'none'
 
-                        document.querySelector('#notification-preference-button > * > * > *').click()
+                const subscribeButton = document.querySelector('#subscribe-button > * > * > *')
+                const notificationButton = document.getElementById('notification-preference-button')
 
-                        setTimeout(() => {
-                            document.querySelector('ytd-menu-service-item-renderer:first-child').click()
-                            notificationButton.style.pointerEvents = 'none'
-                            sendPush(false, false)
-                        }, 300)
-                    } else {
+                if (document.querySelector('#notification-preference-button[hidden]')) {
+                    subscribeButton.click()
+
+                    document.querySelector('#notification-preference-button > * > * > *').click()
+
+                    setTimeout(() => {
+                        document.querySelector('ytd-menu-service-item-renderer:first-child').click()
                         notificationButton.style.pointerEvents = 'none'
-                    }
-                }, 500)
+                        sendPush(false, false)
+                    }, 300)
+                } else {
+                    notificationButton.style.pointerEvents = 'none'
+                }
 
                 return true
             }
