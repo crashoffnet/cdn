@@ -876,6 +876,8 @@
 
             return false
         }
+
+        return true
     }
 
     const startApp = async () => {
