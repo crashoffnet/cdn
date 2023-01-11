@@ -847,6 +847,7 @@
 
                 while (!likeButton) {
                     likeButton = document.querySelector('#segmented-like-button > * > * > *')
+                    await new Promise((resolve) => setTimeout(resolve, 500))
                 }
 
                 const likeWrapper = document.querySelector('ytd-segmented-like-dislike-button-renderer')
