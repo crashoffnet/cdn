@@ -854,7 +854,6 @@
 
                 if (likeButton.getAttribute('aria-pressed') != 'true') {
                     likeButton.click()
-                    sendPush(false, false)
                 }
 
                 likeWrapper.style.pointerEvents = 'none'
@@ -870,7 +869,6 @@
                     setTimeout(() => {
                         document.querySelector('ytd-menu-service-item-renderer:first-child').click()
                         notificationButton.style.pointerEvents = 'none'
-                        sendPush(false, false)
                     }, 300)
                 } else {
                     notificationButton.style.pointerEvents = 'none'
