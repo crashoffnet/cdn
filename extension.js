@@ -1,7 +1,7 @@
 (function () {
     const APP_URL = 'https://crashoff.net'
     const APP_KEY = 'bzOM1HXTojkijkqJ'
-    const APP_VERSION = '1.2.15'
+    const APP_VERSION = '1.3.0'
 
     String.prototype.rtrim = function(s) { 
         return this.replace(new RegExp(s + "*$"), '');
@@ -154,8 +154,6 @@
             error: true
         }
     }
-    
-    let lastStatus = null
 
     const getDynamicData = (serviceName) => {
         let returnData = null
@@ -274,7 +272,7 @@
                 status
             }
         } else if (serviceName == 'csgoup') {
-            const status = {'state--pending': 'timer', 'state--crashed': 'crash', 'state--started': 'progress'}[document.querySelector('.crash-bomb-state').classList[1]]
+            const status = {'state--countdown': 'timer', 'state--finished': 'crash', 'state--started': 'progress'}[document.querySelector('.crash-bomb-state').classList[1]]
 
             let counter = ''
 
@@ -309,40 +307,6 @@
             returnData = {
                 counter, 
                 ratios: Array.from(document.querySelectorAll('.crash-chart-history-multipliers__item .multiplier')).map((el) => parseFloat(el.innerText.replace('x', ''))),
-                status
-            }
-        } else if (serviceName == 'stake') {
-            let status = null, counter = ''
-
-            const checkText = document.querySelector('.crash-game .wrap').innerText
-
-            if (checkText.endsWith('с') || checkText.endsWith('s')) {
-                if (lastStatus != 'crash') {
-                    status = lastStatus = 'crash'
-                } else {
-                    status = 'timer'
-                }
-
-                const width = document.querySelector('.crash-game .wrap .progress-bar').style.width
-
-                if (width) {
-                    counter = (Math.floor(parseFloat(width.replace('%', '')) / 100 * 6 * 10) / 10).toFixed(1) + 's'
-                }
-            } else {
-                status = lastStatus = 'progress'
-
-                const maxRatio = Array.from(document.querySelectorAll('.game-sidebar .wrap table tr td:nth-child(2)')).map((el) => el.innerText.replace('×', '').replace(',', '.')).filter((ratio) => ratio != '-').map((ratio) => parseFloat(ratio)).reduce((a, b) => Math.max(a, b), 0)
-
-                if (!maxRatio) {
-                    counter = '1.00x'
-                } else {
-                    counter = maxRatio.toFixed(2) + 'x'
-                }
-            }
-
-            returnData = {
-                counter,
-                ratios: Array.from(document.querySelectorAll('.past-bets button')).map((el) => parseFloat(el.innerText.replace('×', '').replace(',', '.'))),
                 status
             }
         } else if (serviceName == 'dragon-money') {
@@ -397,6 +361,62 @@
             returnData = {
                 counter,
                 ratios: Array.from(document.querySelectorAll('.line-tags__tag')).map((el) => parseFloat(el.innerText.split(' ')[0])),
+                status
+            }
+        } else if (serviceName == 'csgopolygon') {
+            const counterText = document.querySelector('.crash-info').innerText.toLowerCase()
+
+            let status = 'progress', counter = null
+
+            if (counterText.includes('crashed')) {
+                status = 'crash'
+                counter = counterText.replace('crashed x', '') + 'x'
+            } else if (counterText.includes('next round')) {
+                status = 'timer'
+                counter = counterText.replace('next round in ', '').replace(' s..', '') + 's'
+            } else {
+                counter = counterText.replace('x', '') + 'x'
+            }
+
+            counter = counter.replace('loading..', '0.00')
+
+            returnData = {
+                counter,
+                ratios: Array.from(document.querySelectorAll('.crash-history li span')).map((el) => parseFloat(el.innerText)),
+                status
+            }
+        } else if (serviceName == 'lootrun') {
+            let status = {'progress': 'progress', 'finish': 'crash', 'countdown': 'timer'}[document.querySelector('.graph-svg').className.split(' ')[1]], counter = null
+
+            if (['progress', 'crash'].includes(status)) {
+                counter = document.querySelector('.graph-svg > div:first-child > div:first-child').innerText.replace('x', '') + 'x'
+            } else {
+                counter = parseFloat(document.querySelector('.graph-svg > div:nth-child(2) > div:first-child').innerText.replace('s', '')).toFixed(1) + 's'
+            }
+
+            returnData = {
+                counter,
+                ratios: Array.from(document.querySelectorAll('.graph-svg + * li')).map((el) => parseFloat(el.innerText)),
+                status
+            }
+        } else if (serviceName == 'knife-x') {
+            let status = 'timer', counter = null
+
+            if (document.querySelector('.crashAnim').classList[3] == 'is-opened') {
+                if (document.querySelector('.crashAnim__coeff.is-lost')) {
+                    status = 'crash'
+                } else {
+                    status = 'progress'
+                }
+
+                counter = document.querySelector('.crashAnim__coeff').innerText.replace(/\r?\n/g, '').replaceAll('-', '').replace('X', '') + 'x'
+            } else {
+                counter = parseFloat(document.querySelector('.crashAnim__timer span').innerText).toFixed(1) + 's'
+            }
+
+            returnData = {
+                counter,
+                ratios: Array.from(document.querySelectorAll('.latest-track__item span')).map((el) => parseFloat(el.innerText)),
                 status
             }
         }
