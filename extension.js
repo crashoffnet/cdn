@@ -125,7 +125,10 @@
                                 }
                             }
                         } else if (url.indexOf(pattern) !== -1) {
-                            service = s.slug
+                            service = {
+                                name: s.slug,
+                                modes: JSON.parse(s.modes)
+                            }
                         }
                     }
 
@@ -141,7 +144,7 @@
                 if (service) {
                     return {
                         error: false,
-                        name: service
+                        ...service
                     }
                 }
             } else {
@@ -157,6 +160,10 @@
 
     const getServiceMode = (map) => {
         for (const name in map) {
+            if (name == 'crash') {
+                continue
+            }
+
             if (location.pathname.includes(map[name])) {
                 return name
             }
@@ -165,7 +172,7 @@
         return 'crash'
     }
 
-    const getDynamicData = (serviceName) => {
+    const getDynamicData = ({ name: serviceName, modes: serviceModes }) => {
         let returnData = null
 
         let serviceMode = 'crash'
@@ -197,7 +204,7 @@
                 status
             }
         } else if (serviceName == 'up-x') {
-            serviceMode = getServiceMode({ mines: '/games/miner' })
+            serviceMode = getServiceMode(serviceModes)
 
             if (serviceMode == 'crash') {
                 const crashCounter = document.querySelector('.crash-timer > :last-child'), waitCounter = document.querySelector('.crash-timer > :first-child')
@@ -359,27 +366,33 @@
                 status
             }
         } else if (serviceName == 'get-x') {
-            const ratioElement = document.querySelector('.ratio-timer')
+            serviceMode = getServiceMode(serviceModes)
 
-            let status = null, counter = ''
+            if (serviceMode == 'crash') {
+                const ratioElement = document.querySelector('.ratio-timer')
 
-            if (ratioElement.style.display != 'none') {
-                if (document.querySelector('.ratio-timer.ratio-timer__red')) {
-                    status = 'crash'
+                let status = null, counter = ''
+
+                if (ratioElement.style.display != 'none') {
+                    if (document.querySelector('.ratio-timer.ratio-timer__red')) {
+                        status = 'crash'
+                    } else {
+                        status = 'progress'
+                    }
+
+                    counter = ratioElement.querySelector('span:first-child').innerText + 'x'
                 } else {
-                    status = 'progress'
+                    status = 'timer' 
+                    counter = (Math.floor((1 - parseFloat(getComputedStyle(document.querySelector('.loader__line')).width.replace('px', '')) / 192) * 6 * 10) / 10).toFixed(1) + 's'
                 }
 
-                counter = ratioElement.querySelector('span:first-child').innerText + 'x'
-            } else {
-                status = 'timer' 
-                counter = (Math.floor((1 - parseFloat(getComputedStyle(document.querySelector('.loader__line')).width.replace('px', '')) / 192) * 6 * 10) / 10).toFixed(1) + 's'
-            }
-
-            returnData = {
-                counter,
-                ratios: Array.from(document.querySelectorAll('.line-tags__tag')).map((el) => parseFloat(el.innerText.split(' ')[0])),
-                status
+                returnData = {
+                    counter,
+                    ratios: Array.from(document.querySelectorAll('.line-tags__tag')).map((el) => parseFloat(el.innerText.split(' ')[0])),
+                    status
+                }
+            } else if (serviceMode == 'mines') {
+                returnData = {}
             }
         } else if (serviceName == 'csgopolygon') {
             const counterText = document.querySelector('.crash-info').innerText.toLowerCase()
@@ -439,16 +452,24 @@
             }
         }
 
+        const serviceLinks = {}
+
+        for (const mode in serviceModes) {
+            serviceLinks[mode] = location.origin + serviceModes[mode]
+        }
+
         if (returnData) {
             return {
                 service: serviceName,
                 mode: serviceMode,
+                modes: serviceLinks,
                 ...returnData
             }
         } else {
             return {
                 service: serviceName,
                 mode: 'crash',
+                modes: { 'crash': 'default' },
                 counter: '0.00s',
                 ratios: [],
                 status: 'timer'
@@ -471,7 +492,7 @@
             loop(() => {
                 window.frames.leoApp.postMessage({ key: APP_KEY, action: 'ping', date: Date.now() }, '*')
 
-                window.frames.leoApp.postMessage({ key: APP_KEY, action: 'dynamic_data', dynamicData: getDynamicData(globalService.name) }, '*')
+                window.frames.leoApp.postMessage({ key: APP_KEY, action: 'dynamic_data', dynamicData: getDynamicData(globalService) }, '*')
             }, 100)
         }
 
