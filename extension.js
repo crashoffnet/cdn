@@ -175,9 +175,11 @@
     const getDynamicData = ({ name: serviceName, modes: serviceModes }) => {
         let returnData = null
 
-        let serviceMode = 'crash'
+        let serviceMode = getServiceMode(serviceModes)
 
-        if (serviceName == 'csgorun') {
+        if (serviceMode == 'mines') {
+            returnData = {}
+        } else if (serviceName == 'csgorun') {
             returnData = {
                 counter: document.querySelector('.graph-svg__counter').innerText.replace(/\s/g, ''),
                 ratios: Array.from(document.querySelectorAll('a.px-7')).map((el) => parseFloat(el.innerText.replace('x', ''))),
@@ -204,33 +206,27 @@
                 status
             }
         } else if (serviceName == 'up-x') {
-            serviceMode = getServiceMode(serviceModes)
+            const crashCounter = document.querySelector('.crash-timer > :last-child'), waitCounter = document.querySelector('.crash-timer > :first-child')
 
-            if (serviceMode == 'crash') {
-                const crashCounter = document.querySelector('.crash-timer > :last-child'), waitCounter = document.querySelector('.crash-timer > :first-child')
+            let status = null, counter = ''
 
-                let status = null, counter = ''
+            if (!crashCounter.style.color) {
+                counter = waitCounter.innerText.replace(/\s/g, '').replace('СЕК', 's')
+                status = 'timer'
+            } else {
+                counter = crashCounter.innerText.replace(/\s/g, '').replace('X', 'x')
 
-                if (!crashCounter.style.color) {
-                    counter = waitCounter.innerText.replace(/\s/g, '').replace('СЕК', 's')
-                    status = 'timer'
-                } else {
-                    counter = crashCounter.innerText.replace(/\s/g, '').replace('X', 'x')
-
-                    if (crashCounter.style.color == 'rgb(255, 54, 54)') {
-                        status = 'crash'
-                    } else if (crashCounter.style.color == 'rgb(255, 255, 255)') {
-                        status = 'progress'
-                    }
+                if (crashCounter.style.color == 'rgb(255, 54, 54)') {
+                    status = 'crash'
+                } else if (crashCounter.style.color == 'rgb(255, 255, 255)') {
+                    status = 'progress'
                 }
+            }
 
-                returnData = {
-                    counter,
-                    ratios: Array.from(document.querySelectorAll('.history-block__item')).map((el) => parseFloat(el.innerText.replace('x', ''))),
-                    status
-                }
-            } else if (serviceMode == 'mines') {
-                returnData = {}
+            returnData = {
+                counter,
+                ratios: Array.from(document.querySelectorAll('.history-block__item')).map((el) => parseFloat(el.innerText.replace('x', ''))),
+                status
             }
         } else if (serviceName == 'csgo500') {
             const counterText = document.querySelector('.info-text').innerHTML.trim()
@@ -366,33 +362,27 @@
                 status
             }
         } else if (serviceName == 'get-x') {
-            serviceMode = getServiceMode(serviceModes)
+            const ratioElement = document.querySelector('.ratio-timer')
 
-            if (serviceMode == 'crash') {
-                const ratioElement = document.querySelector('.ratio-timer')
+            let status = null, counter = ''
 
-                let status = null, counter = ''
-
-                if (ratioElement.style.display != 'none') {
-                    if (document.querySelector('.ratio-timer.ratio-timer__red')) {
-                        status = 'crash'
-                    } else {
-                        status = 'progress'
-                    }
-
-                    counter = ratioElement.querySelector('span:first-child').innerText + 'x'
+            if (ratioElement.style.display != 'none') {
+                if (document.querySelector('.ratio-timer.ratio-timer__red')) {
+                    status = 'crash'
                 } else {
-                    status = 'timer' 
-                    counter = (Math.floor((1 - parseFloat(getComputedStyle(document.querySelector('.loader__line')).width.replace('px', '')) / 192) * 6 * 10) / 10).toFixed(1) + 's'
+                    status = 'progress'
                 }
 
-                returnData = {
-                    counter,
-                    ratios: Array.from(document.querySelectorAll('.line-tags__tag')).map((el) => parseFloat(el.innerText.split(' ')[0])),
-                    status
-                }
-            } else if (serviceMode == 'mines') {
-                returnData = {}
+                counter = ratioElement.querySelector('span:first-child').innerText + 'x'
+            } else {
+                status = 'timer' 
+                counter = (Math.floor((1 - parseFloat(getComputedStyle(document.querySelector('.loader__line')).width.replace('px', '')) / 192) * 6 * 10) / 10).toFixed(1) + 's'
+            }
+
+            returnData = {
+                counter,
+                ratios: Array.from(document.querySelectorAll('.line-tags__tag')).map((el) => parseFloat(el.innerText.split(' ')[0])),
+                status
             }
         } else if (serviceName == 'csgopolygon') {
             const counterText = document.querySelector('.crash-info').innerText.toLowerCase()
