@@ -186,23 +186,19 @@
                 status: {'progress': 'progress', 'finish': 'crash', 'countdown': 'timer'}[document.querySelector('.graph-svg').className.split(' ')[1]]
             }
         } else if (serviceName == 'csfail') {
-            let status = null, statusClass = document.querySelector('.bomb-timer').className.split(' ')[1]
+            let status = null, statusClass = document.querySelector('crash-home-timer').className
 
             if (statusClass) {
-                status = {'is-multiplier': 'progress', 'is-explosion': 'crash'}[statusClass]
+                status = {'is-multiplier': 'progress', 'is-dead': 'crash'}[statusClass]
             } else {
                 status = 'timer'
             }
 
-            let counter = document.querySelector('.bomb-timer__numbers').innerText.replace(/\s/g, '') + document.querySelector('.bomb-timer__ending').innerText.replace(/\s/g, '').replace('sec', 's')
-
-            if (counter[0] == '0') {
-                counter = counter.substr(1)
-            }
+            let counter = document.querySelector('.timer__timer').innerText.replace(/\s/g, '')
             
             returnData = {
                 counter,
-                ratios: Array.from(document.querySelectorAll('.crash-history__wrapper a')).map((el) => parseFloat(el.innerText.replace('x', ''))),
+                ratios: Array.from(document.querySelectorAll('.history__game')).map((el) => parseFloat(el.innerText.replace('x', ''))),
                 status
             }
         } else if (serviceName == 'up-x') {
@@ -746,7 +742,7 @@
                                         localStorage.setItem('leo_ads_vk_seen', Date.now())
                                     }
 
-                                    ads.href = 'https://vk.com/@crashoffnet-gaid-kak-igrat-pri-pomoschi-leo-ai'
+                                    ads.href = 'https://telegra.ph/Arhiv-urokov-03-03'
                                     ads.className = 'leo-ads-vk'
                                     ads.innerHTML = `<div class="ads_ad_box redesign"><img src="${getImage()}"><div class="ads_ad_title ver repeat_ver redesign" style="font-weight: 700">Гайд по игре</div><div class="ads_ad_domain ver redesign">LEONARDO</div><div style="color: white;margin-top: 3px;line-height: 15px;">Узнайте как правильно играть с Leonardo и какие существуют тактики</div></div>`
                                     leftAds.appendChild(ads)
@@ -879,7 +875,7 @@
                         await fetch(`https://crashoff.net/api/vk?vk_id=-1&unique_id=${params.la_user}`)
                     }
 
-                    location = 'https://vk.com/@crashoffnet-gaid-kak-igrat-pri-pomoschi-leo-ai'
+                    location = 'https://telegra.ph/Arhiv-urokov-03-03'
                 } else if (params.la == 'config') {
                     createGuide('Настраиваем сайт...')
 
