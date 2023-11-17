@@ -436,6 +436,14 @@
                 ratios: Array.from(document.querySelectorAll('.latest-track__item span')).map((el) => parseFloat(el.innerText)),
                 status
             }
+        } else if (serviceName == 'kebup') {
+            let status = document.querySelector('.crash-wrap').classList[1].replace('status-', ''), counter = document.querySelector('.crash-timer').innerText.replace('Краш на ', '')
+
+            returnData = {
+                counter,
+                ratios: Array.from(document.querySelectorAll('.crash-ratios__item')).map((el) => parseFloat(el.innerText)),
+                status
+            }
         }
 
         const serviceLinks = {}
