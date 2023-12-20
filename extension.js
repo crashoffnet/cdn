@@ -437,7 +437,7 @@
                 status
             }
         } else if (serviceName == 'kebup') {
-            let status = document.querySelector('.crash-wrap').classList[1].replace('status-', ''), counter = document.querySelector('.crash-timer').innerText.replace('Краш на ', '')
+            let status = document.querySelector('.crash-wrapper').classList[1].replace('status-', ''), counter = document.querySelector('.crash-timer').innerText.replace('Краш на ', '')
 
             returnData = {
                 counter,
