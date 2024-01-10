@@ -181,9 +181,9 @@
             returnData = {}
         } else if (serviceName == 'csgorun') {
             returnData = {
-                counter: document.querySelector('.graph-svg__counter').innerText.replace(/\s/g, ''),
-                ratios: Array.from(document.querySelectorAll('a.px-7')).map((el) => parseFloat(el.innerText.replace('x', ''))),
-                status: {'progress': 'progress', 'finish': 'crash', 'countdown': 'timer'}[document.querySelector('.graph-svg').className.split(' ')[1]]
+                counter: document.querySelector('[data-crash-counter]').getAttribute('data-value'),
+                ratios: Array.from(document.querySelectorAll('.crash-history-item')).map((el) => parseFloat(el.innerText.replace('X', ''))),
+                status: {'В раунде': 'progress', 'Краш': 'crash', 'Раунд через': 'timer'}[document.querySelector('[data-crash-counter-desc]').innerText]
             }
         } else if (serviceName == 'csfail') {
             let status = null, statusClass = document.querySelector('crash-home-timer').className
@@ -197,7 +197,7 @@
             let counter = document.querySelector('.timer__timer').innerText.replace(/\s/g, '')
             
             returnData = {
-                counter,
+                counter: counter.includes('x') ? counter.replace('x', '') + 'x' : counter,
                 ratios: Array.from(document.querySelectorAll('.history__game')).map((el) => parseFloat(el.innerText.replace('x', ''))),
                 status
             }
@@ -327,7 +327,7 @@
                 status
             }
         } else if (serviceName == 'dragon-money') {
-            const ratioElement = document.querySelector('.multiplier-view'), graphicElement = document.querySelector('.disable-graphic')
+            const ratioElement = document.querySelector('.multiplier-view'), graphicElement = document.querySelector('button[name="guard"]')
 
             if (!ratioElement) {
                 graphicElement.click()
@@ -339,7 +339,7 @@
 
             let status = null, counter = ''
 
-            if (document.querySelector('.time-till-start').style.display == 'none') {
+            if (document.querySelector('.absolute.text-center.text-h5.text-yellow').style.display == 'none') {
                 if (document.querySelector('.multiplier-view.no-schedule-end')) {
                     status = 'crash'
                 } else {
@@ -349,7 +349,7 @@
                 counter = ratioElement.innerText
             } else {
                 status = 'timer'
-                counter = parseFloat(document.querySelector('.text-time-start').innerText.replace('Начало игры через ', '').trim()).toFixed(1) + 's'
+                counter = parseFloat(document.querySelector('.absolute.text-center.text-h5.text-yellow p').innerText.replace('с.', '').trim()).toFixed(1) + 's'
             }
 
             returnData = {
