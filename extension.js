@@ -84,6 +84,8 @@
             return 'lucky-jet.com'
         } else if (document.title.includes('Dragon Money')) {
             return 'drgn.com'
+        } else if (document.title.includes('GET-X')) {
+            return 'getx.com'
         }
         
         return encodeURIComponent(location.href.rtrim('/').replace('https://', ''))
