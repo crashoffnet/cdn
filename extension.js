@@ -179,7 +179,7 @@
 
         let serviceMode = getServiceMode(serviceModes)
 
-        if (serviceMode == 'mines') {
+        if (serviceMode == 'mines' || serviceMode == 'slots') {
             returnData = {}
         } else if (serviceName == 'csgorun') {
             returnData = {
