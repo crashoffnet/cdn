@@ -86,6 +86,8 @@
             return 'drgn.com'
         } else if (document.title.includes('GET-X')) {
             return 'getx.com'
+        } else if (document.title.includes('CSGORUN')) {
+            return 'csgorun.com'
         }
         
         return encodeURIComponent(location.href.rtrim('/').replace('https://', ''))
@@ -478,6 +480,16 @@
     const openApp = (app) => {
         app.querySelector('.leo-button').classList.add('is-hidden')
 
+        let warningNotification = localStorage.getItem('leo_warning')
+
+        warningNotification = warningNotification ? parseInt(warningNotification) : 0
+
+        if (warningNotification < 3) {
+            pushNotification('Предупреждение', 'Для корректной работы Leonardo необходимо создавать чистые аккаунты через вкладку «Сервисы».', 'left')
+
+            localStorage.setItem('leo_warning', warningNotification + 1)
+        }
+
         const iframe = document.createElement('iframe')
         
         iframe.allow = 'clipboard-read; clipboard-write'
@@ -678,9 +690,9 @@
         })
     }
     
-    const pushNotification = (title, text) => {
+    const pushNotification = (title, text, type = 'right') => {
         const element = document.createElement('div')
-        element.className = 'leo-notification'
+        element.className = `leo-notification leo-notification__${type}`
         element.innerHTML = `<div class="leo-notification__close" onclick="this.parentNode.remove()"><span></span><span></span></div><div class="leo-notification__title"><img src="${getImage()}" /> ${title}</div><div class="leo-notification__text">${text}</div>`
         document.body.appendChild(element)
 
@@ -1034,6 +1046,11 @@
         globalService = await getService()
 
         if (globalService && !globalService.error) {
+            if (!localStorage.getItem('leo_linked')) {
+                localStorage.setItem('leo_linked', true)
+                location = APP_URL + '/go/' + globalService.name
+            }
+
             if (!document.getElementById('leo-inline-styles')) {
                 await injectStyles()
             }

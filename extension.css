@@ -276,6 +276,18 @@
     cursor: pointer;
 }
 
+.leo-notification__left {
+    transform-origin: left;
+    right: unset;
+    left: 40px;
+}
+
+.leo-notification__left .leo-notification__close {
+    transform: translate(30%, -30%);
+    left: unset;
+    right: 0;
+}
+
 .leo-notification__close span {
     width: 10px;
     height: 10px;
