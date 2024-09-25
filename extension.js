@@ -78,7 +78,9 @@
     }
 
     const getServiceUrl = () => {
-        if (document.title.split(' ')[0] == 'UP-X') {
+        if (document.title.includes('Нейросеть')) {
+            return 'master'
+        } else if (document.title.split(' ')[0] == 'UP-X') {
             return 'up-x.com'
         } else if (document.title.trim() == 'Aviator') {
             return 'lucky-jet.com'
