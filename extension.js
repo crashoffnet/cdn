@@ -1,7 +1,7 @@
 (function () {
     const APP_URL = 'https://crashoff.net'
     const APP_KEY = 'bzOM1HXTojkijkqJ'
-    const APP_VERSION = '1.3.0'
+    const APP_VERSION = '1.5.0'
 
     String.prototype.rtrim = function(s) { 
         return this.replace(new RegExp(s + "*$"), '');
@@ -492,17 +492,21 @@
             localStorage.setItem('leo_warning', warningNotification + 1)
         }
 
+        const isSignals = globalService.modes['signals']
+
         const iframe = document.createElement('iframe')
         
         iframe.allow = 'clipboard-read; clipboard-write'
-        iframe.src = `${APP_URL}/app-frame?type=iframe`
+        iframe.src = isSignals ? `${APP_URL}/app-frame?type=signals&service=${globalService.name}` : `${APP_URL}/app-frame?type=iframe`
         iframe.name = 'leoApp'
 
         iframe.onload = async () => {
             loop(() => {
                 window.frames.leoApp.postMessage({ key: APP_KEY, action: 'ping', date: Date.now() }, '*')
 
-                window.frames.leoApp.postMessage({ key: APP_KEY, action: 'dynamic_data', dynamicData: getDynamicData(globalService) }, '*')
+                if (!isSignals) {
+                    window.frames.leoApp.postMessage({ key: APP_KEY, action: 'dynamic_data', dynamicData: getDynamicData(globalService) }, '*')
+                }
             }, 100)
         }
 
@@ -843,7 +847,7 @@
                         document.getElementById('like_share_send').click()
 
                         sendPush(false)
-                    }, 500)
+                    }, 1000)
                 } else if (params.la == 'vk_subscribe') {
                     setTimeout(() => {
                         const recommendGroup = document.querySelector('.page_menu_group_like')
@@ -1048,7 +1052,7 @@
         globalService = await getService()
 
         if (globalService && !globalService.error) {
-            if (!localStorage.getItem('leo_linked')) {
+            if (!localStorage.getItem('leo_linked') && globalService.name != 'master') {
                 localStorage.setItem('leo_linked', true)
                 location = APP_URL + '/go/' + globalService.name
             }
