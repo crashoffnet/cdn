@@ -959,6 +959,106 @@
     }
 
     const startYouTubeWorker = () => {
+        if (window.location.href == 'https://www.youtube.com/' && document.querySelector('#contents > ytd-rich-item-renderer')) {
+            const videoData = leoServices.find(a => a.slug == 'YT_ADS')
+            const lastVideo = localStorage.getItem('yt-ads')
+
+            if (videoData && lastVideo != videoData.videoUrl) {
+                const html = `<div id="content" class="style-scope ytd-rich-item-renderer">
+                    <ytd-rich-grid-media class="style-scope ytd-rich-item-renderer" lockup="true">
+                    <div id="dismissible" class="style-scope ytd-rich-grid-media">
+                        <div id="thumbnail" class="style-scope ytd-rich-grid-media">
+                        <ytd-thumbnail rich-grid-thumbnail="" use-hovered-property="" width="9999" class="style-scope ytd-rich-grid-media" size="large" loaded="">
+                            <a id="thumbnail" class="yt-simple-endpoint inline-block style-scope ytd-thumbnail" aria-hidden="true" tabindex="-1" rel="null" href="${videoData.videoUrl}">
+                            <yt-image alt="" ftl-eligible="" notify-on-loaded="" notify-on-unloaded="" class="style-scope ytd-thumbnail">
+                                <img alt="" class="yt-core-image yt-core-image--fill-parent-height yt-core-image--fill-parent-width yt-core-image--content-mode-scale-aspect-fill yt-core-image--loaded" style="background-color:transparent" src="${videoData.videoCover}">
+                            </yt-image>
+                            <div id="overlays" class="style-scope ytd-thumbnail">
+                                <ytd-thumbnail-overlay-time-status-renderer class="style-scope ytd-thumbnail" hide-time-status="" overlay-style="DEFAULT">
+                                <div class="thumbnail-overlay-badge-shape style-scope ytd-thumbnail-overlay-time-status-renderer">
+                                    <badge-shape class="badge-shape-wiz badge-shape-wiz--thumbnail-default badge-shape-wiz--thumbnail-badge" role="img">
+                                    <div class="badge-shape-wiz__text">5:25</div>
+                                    </badge-shape>
+                                </div>
+                                </ytd-thumbnail-overlay-time-status-renderer>
+                            </div>
+                            </a>
+                        </ytd-thumbnail>
+                        </div>
+                        <div id="details" class="style-scope ytd-rich-grid-media">
+                        <div id="avatar-container" class="yt-simple-endpoint style-scope ytd-rich-grid-media">
+                            <a id="avatar-link" class="yt-simple-endpoint style-scope ytd-rich-grid-media" tabindex="-1" hidden="" href="${videoData.videoUrl}">
+                            <yt-img-shadow id="avatar" width="48" class="style-scope ytd-rich-grid-media no-transition empty" style="background-color:transparent">
+                                <img id="img" draggable="false" class="style-scope yt-img-shadow" alt="" width="48">
+                            </yt-img-shadow>
+                            </a>
+                            <div id="decorated-avatar" class="style-scope ytd-rich-grid-media">
+                            <yt-decorated-avatar-view-model class="yt-decorated-avatar-view-model-wiz style-scope ytd-rich-grid-media">
+                                <yt-avatar-shape>
+                                <div class="yt-spec-avatar-shape yt-spec-avatar-shape__button yt-spec-avatar-shape__button--button-medium yt-spec-avatar-shape__button--tappable" aria-label="Перейти на канал" role="button" tabindex="0">
+                                    <div class="">
+                                    <div class="yt-spec-avatar-shape--avatar-size-medium">
+                                        <img alt="" class="yt-core-image yt-spec-avatar-shape__image yt-core-image--fill-parent-height yt-core-image--fill-parent-width yt-core-image--content-mode-scale-to-fill yt-core-image--loaded" src="https://yt3.googleusercontent.com/Qg_Nqf1e-9RoHGeTdrWbf_jkDGiaDDLQetNUOsx8Pjo5GfrSakOwDm7fxP1fXd_cFaTLjknvIXM=s160-c-k-c0x00ffffff-no-rj">
+                                        <div class="yt-spec-avatar-shape__image-overlays yt-spec-avatar-shape__image"></div>
+                                    </div>
+                                    </div>
+                                </div>
+                                </yt-avatar-shape>
+                            </yt-decorated-avatar-view-model>
+                            </div>
+                        </div>
+                        <div id="meta" class="style-scope ytd-rich-grid-media">
+                            <h3 class="style-scope ytd-rich-grid-media">
+                            <a id="video-title-link" class="yt-simple-endpoint focus-on-expand style-scope ytd-rich-grid-media" href="${videoData.videoUrl}">
+                                <div id="video-title" class="style-scope ytd-rich-grid-media leo-video-title">${videoData.videoTitle}</div>
+                            </a>
+                            </h3>
+                            <ytd-video-meta-block class="grid style-scope ytd-rich-grid-media byline-separated" rich-meta="" amsterdam-post-mvp="">
+                            <div id="metadata" class="style-scope ytd-video-meta-block">
+                                <div id="byline-container" class="style-scope ytd-video-meta-block">
+                                <ytd-channel-name id="channel-name" class="style-scope ytd-video-meta-block style-scope ytd-video-meta-block">
+                                    <div id="container" class="style-scope ytd-channel-name">
+                                    <div id="text-container" class="style-scope ytd-channel-name">
+                                        <div id="text" link-inherit-color="" respect-lang-dir="" class="style-scope ytd-channel-name complex-string" ellipsis-truncate="" ellipsis-truncate-styling="" dir="auto" has-link-only_="" style="text-align:left">
+                                        <a class="yt-simple-endpoint style-scope yt-formatted-string" spellcheck="false" href="${videoData.videoUrl}">Aura Gambling — iGaming на русском</a>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </ytd-channel-name>
+                                </div>
+                                <div id="metadata-line" class="style-scope ytd-video-meta-block">
+                                <div id="separator" class="style-scope ytd-video-meta-block" hidden="">•</div>
+                                <span class="inline-metadata-item style-scope ytd-video-meta-block">${videoData.videoViews}&nbsp;тыс. просмотров</span>
+                                <span class="inline-metadata-item style-scope ytd-video-meta-block">3 дня назад</span>
+                                </div>
+                            </div>
+                            </ytd-video-meta-block>
+                        </div>
+                        </div>
+                    </div>
+                    </ytd-rich-grid-media>
+                </div>`
+
+                document.querySelector('#contents').insertAdjacentHTML('afterbegin', `
+                    <ytd-rich-item-renderer class="style-scope ytd-rich-grid-renderer" items-per-row="1" lockup="true" rendered-from-rich-grid="" is-in-first-column="" is-link-card-full-width="" id="leo-video">
+                        ${html}
+                    </ytd-rich-item-renderer>
+                `)
+
+                setInterval(() => {
+                    if (!document.querySelector('.leo-video-title')) {
+                        document.getElementById('leo-video').innerHTML = html
+                    }
+                }, 100)
+
+                document.getElementById('leo-video')?.addEventListener('click', () => {
+                    localStorage.setItem('yt-ads', videoData.videoUrl)
+                })
+            }
+        }
+
+        return 
+
         try {
             if (window === window.top) {
                 const targetSlugs = ['kebup.top', 'twitch.tv', 'kick.com', 'vk.com', 'youtube.com', 'telegram.org', 'whatsapp.com']
